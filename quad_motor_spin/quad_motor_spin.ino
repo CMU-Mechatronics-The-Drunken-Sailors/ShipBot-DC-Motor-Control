@@ -1,9 +1,9 @@
 // Mechatronics - Spring 2022
 // Runs on Teensy 4.1 with two L293 motor drivers.
 // Spins 4 motors, forwards and backwards.
-// Uses this library: https://github.com/qub1750ul/Arduino_L293
+// Uses this library: https://github.com/TheArduinist/DRV8833
 
-#include <L293.h>
+#include <DRV8833.h>
 
 // enum
 const int M1 = 1;
@@ -11,35 +11,26 @@ const int M2 = 2;
 const int M3 = 3;
 const int M4 = 4;
 
-// motor speed pins
-const int M1_SPEED = 2;
-const int M2_SPEED = 29;
-const int M3_SPEED = 23;
-const int M4_SPEED = 36;
-
-// motor direction pins
-const int M1_DIRECTION = 3;
-const int M2_DIRECTION = 30;
-const int M3_DIRECTION = 22;
-const int M4_DIRECTION = 35;
+// motor speed/direction pins
+const int M1_FORWARD = 2;
+const int M1_BACKWARD = 3;
+const int M2_FORWARD = 28;
+const int M2_BACKWARD = 29;
+const int M3_FORWARD = 23;
+const int M3_BACKWARD = 22;
+const int M4_FORWARD = 37;
+const int M4_BACKWARD = 36;
 
 // motor objects
-L293_twoWire M1_DRIVER(M1_SPEED, M1_DIRECTION);
-L293_twoWire M2_DRIVER(M2_SPEED, M2_DIRECTION);
-L293_twoWire M3_DRIVER(M3_SPEED, M3_DIRECTION);
-L293_twoWire M4_DRIVER(M4_SPEED, M4_DIRECTION);
+DRV8833 DRIVER_A = DRV8833();
+DRV8833 DRIVER_B = DRV8833();
 
 void setup()
 {
-  pinMode(M1_SPEED, OUTPUT);
-  pinMode(M2_SPEED, OUTPUT);
-  pinMode(M3_SPEED, OUTPUT);
-  pinMode(M4_SPEED, OUTPUT);
-
-  pinMode(M1_DIRECTION, OUTPUT);
-  pinMode(M2_DIRECTION, OUTPUT);
-  pinMode(M3_DIRECTION, OUTPUT);
-  pinMode(M4_DIRECTION, OUTPUT);
+  DRIVER_A.attachMotorA(M1_FORWARD, M1_BACKWARD); // M1 pins
+  DRIVER_A.attachMotorB(M2_FORWARD, M2_BACKWARD); // M2 pins
+  DRIVER_B.attachMotorA(M3_FORWARD, M3_BACKWARD); // M3 pins
+  DRIVER_B.attachMotorB(M4_FORWARD, M4_BACKWARD); // M4 pins
 }
 
 void spin_motor(int motor, int target_speed)
@@ -48,30 +39,30 @@ void spin_motor(int motor, int target_speed)
   {
     case 1:
       if (target_speed > 0)
-        M1_DRIVER.forward(target_speed);
+        DRIVER_A.motorAForward(target_speed);
       else
-        M1_DRIVER.back(abs(target_speed));
+        DRIVER_A.motorAReverse(abs(target_speed));
       break;
 
     case 2:
       if (target_speed > 0)
-        M2_DRIVER.forward(target_speed);
+        DRIVER_A.motorBForward(target_speed);
       else
-        M2_DRIVER.back(abs(target_speed));
+        DRIVER_A.motorBReverse(abs(target_speed));
       break;
 
     case 3:
       if (target_speed > 0)
-        M3_DRIVER.forward(target_speed);
+        DRIVER_B.motorAForward(target_speed);
       else
-        M3_DRIVER.back(abs(target_speed));
+        DRIVER_B.motorAReverse(abs(target_speed));
       break;
 
     case 4:
       if (target_speed > 0)
-        M4_DRIVER.forward(target_speed);
+        DRIVER_B.motorBForward(target_speed);
       else
-        M4_DRIVER.back(abs(target_speed));
+        DRIVER_B.motorBReverse(abs(target_speed));
       break;
 
     default:
@@ -81,15 +72,15 @@ void spin_motor(int motor, int target_speed)
 
 void loop()
 {
-  spin_motor(M1, 100);
-  spin_motor(M2, 100);
-  spin_motor(M3, 100);
-  spin_motor(M4, 100);
-  delay(1000);
+  spin_motor(M1, 255);
+  spin_motor(M2, 255);
+  spin_motor(M3, 255);
+  spin_motor(M4, 255);
+  delay(3000);
   
-  spin_motor(M1, -100);
-  spin_motor(M2, -100);
-  spin_motor(M3, -100);
-  spin_motor(M4, -100);
-  delay(1000);
+  spin_motor(M1, -255);
+  spin_motor(M2, -255);
+  spin_motor(M3, -255);
+  spin_motor(M4, -255);
+  delay(3000);
 }

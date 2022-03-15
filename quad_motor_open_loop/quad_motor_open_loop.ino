@@ -14,38 +14,34 @@ const int M4 = 4;
 
 // motor speed pins
 const int M1_SPEED = 2;
-const int M2_SPEED = 29;
+const int M2_SPEED = 28;
 const int M3_SPEED = 23;
-const int M4_SPEED = 36;
+const int M4_SPEED = 37;
 
 // motor direction pins
-const int M1_DIRECTION = 3;
-const int M2_DIRECTION = 30;
-const int M3_DIRECTION = 22;
-const int M4_DIRECTION = 35;
+const int M1_DIRECTION_F = 3;
+const int M1_DIRECTION_B = 4;
+const int M2_DIRECTION_F = 29;
+const int M2_DIRECTION_B = 30;
+const int M3_DIRECTION_F = 22;
+const int M3_DIRECTION_B = 21;
+const int M4_DIRECTION_F = 36;
+const int M4_DIRECTION_B = 35;
 
 // motor objects
-L293_twoWire M1_DRIVER(M1_SPEED, M1_DIRECTION);
-L293_twoWire M2_DRIVER(M2_SPEED, M2_DIRECTION);
-L293_twoWire M3_DRIVER(M3_SPEED, M3_DIRECTION);
-L293_twoWire M4_DRIVER(M4_SPEED, M4_DIRECTION);
+L293 M1_DRIVER(M1_SPEED, M1_DIRECTION_F, M1_DIRECTION_B);
+L293 M2_DRIVER(M2_SPEED, M2_DIRECTION_F, M2_DIRECTION_B);
+L293 M3_DRIVER(M3_SPEED, M3_DIRECTION_F, M3_DIRECTION_B);
+L293 M4_DRIVER(M4_SPEED, M4_DIRECTION_F, M4_DIRECTION_B);
 
 // keep track of current speed/direction
-int M1_current_speed, M2_current_speed, M3_current_speed, M4_current_speed = 0;
+int M1_current_speed, M2_current_speed, M3_current_speed, M4_current_speed = 50;
 
 void setup()
 {
   Serial.begin(9600);
-  
-  pinMode(M1_SPEED, OUTPUT);
-  pinMode(M2_SPEED, OUTPUT);
-  pinMode(M3_SPEED, OUTPUT);
-  pinMode(M4_SPEED, OUTPUT);
-  
-  pinMode(M1_DIRECTION, OUTPUT);
-  pinMode(M2_DIRECTION, OUTPUT);
-  pinMode(M3_DIRECTION, OUTPUT);
-  pinMode(M4_DIRECTION, OUTPUT);
+
+  // pins get set in L293 library
 }
 
 void spin_motor(int motor, int target_speed)
@@ -121,8 +117,10 @@ void loop()
     int result = sscanf(input_buffer, "%d %d %d %d\n",
                         &M1_new_speed, &M2_new_speed,
                         &M3_new_speed, &M4_new_speed);
-      
-    // check for bad input                    
+
+    Serial.println(input_buffer); // echo back
+
+    // check for bad input
     if (result != 4)
     {
       Serial.println("Didn't enter correct format.");
@@ -135,25 +133,25 @@ void loop()
       M1_current_speed = M1_new_speed;
       spin_motor(M1, M1_current_speed);
     }
-    
+
     if (M2_new_speed != M2_current_speed)
     {
       M2_current_speed = M2_new_speed;
       spin_motor(M2, M2_current_speed);
     }
-    
+
     if (M3_new_speed != M3_current_speed)
     {
       M3_current_speed = M3_new_speed;
       spin_motor(M3, M3_current_speed);
     }
-    
+
     if (M4_new_speed != M4_current_speed)
     {
       M4_current_speed = M4_new_speed;
       spin_motor(M4, M4_current_speed);
     }
-    
+
     Serial.println("~~~~~~~~~~");
     Serial.print("M1 speed: ");
     Serial.println(M1_current_speed);
@@ -165,4 +163,9 @@ void loop()
     Serial.println(M4_current_speed);
     Serial.println("~~~~~~~~~~");
   }
+
+  spin_motor(M1, M1_current_speed);
+  spin_motor(M2, M2_current_speed);
+  spin_motor(M3, M3_current_speed);
+  spin_motor(M4, M4_current_speed);
 }
