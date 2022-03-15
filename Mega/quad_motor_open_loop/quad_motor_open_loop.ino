@@ -1,10 +1,10 @@
 // Mechatronics - Spring 2022
-// Runs on Teensy 4.1 with two L293 motor drivers.
+// Runs on Arduino Mega with two DRV8833 motor drivers.
 // Allows open-loop control of 4 motors.
 // User sends PWM commands via serial communications.
-// Uses this library: https://github.com/qub1750ul/Arduino_L293
+// Uses this library: https://github.com/TheArduinist/DRV8833
 
-#include <L293.h>
+#include <DRV8833.h>
 
 // enum
 const int M1 = 1;
@@ -12,36 +12,31 @@ const int M2 = 2;
 const int M3 = 3;
 const int M4 = 4;
 
-// motor speed pins
-const int M1_SPEED = 2;
-const int M2_SPEED = 28;
-const int M3_SPEED = 23;
-const int M4_SPEED = 37;
+// motor speed/direction pins (PWM)
+const int M1_FORWARD = 13;
+const int M1_BACKWARD = 12;
+const int M2_FORWARD = 11;
+const int M2_BACKWARD = 10;
+const int M3_FORWARD = 9;
+const int M3_BACKWARD = 8;
+const int M4_FORWARD = 3;
+const int M4_BACKWARD = 2;
 
-// motor direction pins
-const int M1_DIRECTION_F = 3;
-const int M1_DIRECTION_B = 4;
-const int M2_DIRECTION_F = 29;
-const int M2_DIRECTION_B = 30;
-const int M3_DIRECTION_F = 22;
-const int M3_DIRECTION_B = 21;
-const int M4_DIRECTION_F = 36;
-const int M4_DIRECTION_B = 35;
-
-// motor objects
-L293 M1_DRIVER(M1_SPEED, M1_DIRECTION_F, M1_DIRECTION_B);
-L293 M2_DRIVER(M2_SPEED, M2_DIRECTION_F, M2_DIRECTION_B);
-L293 M3_DRIVER(M3_SPEED, M3_DIRECTION_F, M3_DIRECTION_B);
-L293 M4_DRIVER(M4_SPEED, M4_DIRECTION_F, M4_DIRECTION_B);
+// motor objects (A for 1&2, B for 3&4)
+DRV8833 DRIVER_A = DRV8833();
+DRV8833 DRIVER_B = DRV8833();
 
 // keep track of current speed/direction
-int M1_current_speed, M2_current_speed, M3_current_speed, M4_current_speed = 50;
+int M1_current_speed, M2_current_speed, M3_current_speed, M4_current_speed = 0;
 
 void setup()
 {
-  Serial.begin(9600);
-
-  // pins get set in L293 library
+  Serial.begin(115200);
+  
+  DRIVER_A.attachMotorA(M1_FORWARD, M1_BACKWARD); // M1 pins
+  DRIVER_A.attachMotorB(M2_FORWARD, M2_BACKWARD); // M2 pins
+  DRIVER_B.attachMotorA(M3_FORWARD, M3_BACKWARD); // M3 pins
+  DRIVER_B.attachMotorB(M4_FORWARD, M4_BACKWARD); // M4 pins
 }
 
 void spin_motor(int motor, int target_speed)
@@ -50,30 +45,30 @@ void spin_motor(int motor, int target_speed)
   {
     case 1:
       if (target_speed > 0)
-        M1_DRIVER.forward(target_speed);
+        DRIVER_A.motorAForward(target_speed);
       else
-        M1_DRIVER.back(abs(target_speed));
+        DRIVER_A.motorAReverse(abs(target_speed));
       break;
 
     case 2:
       if (target_speed > 0)
-        M2_DRIVER.forward(target_speed);
+        DRIVER_A.motorBForward(target_speed);
       else
-        M2_DRIVER.back(abs(target_speed));
+        DRIVER_A.motorBReverse(abs(target_speed));
       break;
 
     case 3:
       if (target_speed > 0)
-        M3_DRIVER.forward(target_speed);
+        DRIVER_B.motorAForward(target_speed);
       else
-        M3_DRIVER.back(abs(target_speed));
+        DRIVER_B.motorAReverse(abs(target_speed));
       break;
 
     case 4:
       if (target_speed > 0)
-        M4_DRIVER.forward(target_speed);
+        DRIVER_B.motorBForward(target_speed);
       else
-        M4_DRIVER.back(abs(target_speed));
+        DRIVER_B.motorBReverse(abs(target_speed));
       break;
 
     default:
@@ -118,8 +113,6 @@ void loop()
                         &M1_new_speed, &M2_new_speed,
                         &M3_new_speed, &M4_new_speed);
 
-    Serial.println(input_buffer); // echo back
-
     // check for bad input
     if (result != 4)
     {
@@ -163,9 +156,4 @@ void loop()
     Serial.println(M4_current_speed);
     Serial.println("~~~~~~~~~~");
   }
-
-  spin_motor(M1, M1_current_speed);
-  spin_motor(M2, M2_current_speed);
-  spin_motor(M3, M3_current_speed);
-  spin_motor(M4, M4_current_speed);
 }

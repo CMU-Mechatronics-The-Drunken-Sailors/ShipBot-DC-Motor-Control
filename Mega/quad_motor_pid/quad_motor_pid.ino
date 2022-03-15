@@ -1,16 +1,14 @@
 // Mechatronics - Spring 2022
-// Runs on Teensy 4.1 with two L293 motor drivers.
+// Runs on Arduino Mega with two DRV8833 motor drivers.
 // Spins 4 motors, forwards and backwards, and reads encoder data for PID feedback.
 // Motors controlled via serial communications, giving commands of degrees/second.
 //
 // Uses these libraries:
-// https://github.com/qub1750ul/Arduino_L293
+// https://github.com/TheArduinist/DRV8833
 // https://github.com/PaulStoffregen/Encoder
 // https://github.com/PowerBroker2/ArduPID
-//
-// Motor used: // Motor used: https://media.digikey.com/pdf/Data%20Sheets/DFRobot%20PDFs/FIT0186_Web.pdf
 
-#include <L293.h>
+#include <DRV8833.h>
 #include <Encoder.h>
 #include <ArduPID.h>
 
@@ -20,33 +18,34 @@ const int M2 = 2;
 const int M3 = 3;
 const int M4 = 4;
 
-// motor speed pins
-const int M1_SPEED = 2;
-const int M2_SPEED = 29;
-const int M3_SPEED = 23;
-const int M4_SPEED = 36;
+// motor speed/direction pins (PWM)
+const int M1_FORWARD = 13;
+const int M1_BACKWARD = 12;
+const int M2_FORWARD = 11;
+const int M2_BACKWARD = 10;
+const int M3_FORWARD = 9;
+const int M3_BACKWARD = 8;
+const int M4_FORWARD = 3;
+const int M4_BACKWARD = 2;
 
-// motor direction pins
-const int M1_DIRECTION = 3;
-const int M2_DIRECTION = 30;
-const int M3_DIRECTION = 22;
-const int M4_DIRECTION = 35;
+// motor objects (A for 1&2, B for 3&4)
+DRV8833 DRIVER_A = DRV8833();
+DRV8833 DRIVER_B = DRV8833();
 
-// motor encoder pins
-const int M1_ENCODER_A = 4;
-const int M1_ENCODER_B = 5;
-const int M2_ENCODER_A = 31;
-const int M2_ENCODER_B = 32;
-const int M3_ENCODER_A = 21;
-const int M3_ENCODER_B = 20;
-const int M4_ENCODER_A = 34;
-const int M4_ENCODER_B = 33;
+// motor encoder pins (interrupts for A)
+const int M1_ENCODER_A = 18;
+const int M1_ENCODER_B = 14;
+const int M2_ENCODER_A = 19;
+const int M2_ENCODER_B = 15;
+const int M3_ENCODER_A = 20;
+const int M3_ENCODER_B = 16;
+const int M4_ENCODER_A = 21;
+const int M4_ENCODER_B = 17;
 
 // based on ticks per revolution
-const float DEGREES_PER_TICK = (360.0 / 2797);
+const float DEGREES_PER_TICK = (360.0 / 2797.0);
 
-// DC motor 1's driver, encoder, and PID values
-L293_twoWire M1_DRIVER(M1_SPEED, M1_DIRECTION);
+// DC motor 1's encoder and PID values
 Encoder M1_ENCODER(M1_ENCODER_A, M1_ENCODER_B);
 ArduPID M1_PID;
 
@@ -56,8 +55,7 @@ volatile double M1_pid_out = 0;
 volatile unsigned long M1_last_time;
 volatile long M1_last_enc;
 
-// DC motor 2's driver, encoder, and PID values
-L293_twoWire M2_DRIVER(M2_SPEED, M2_DIRECTION);
+// DC motor 2's encoder and PID values
 Encoder M2_ENCODER(M2_ENCODER_A, M2_ENCODER_B);
 ArduPID M2_PID;
 
@@ -67,8 +65,7 @@ volatile double M2_pid_out = 0;
 volatile unsigned long M2_last_time;
 volatile long M2_last_enc;
 
-// DC motor 3's driver, encoder, and PID values
-L293_twoWire M3_DRIVER(M3_SPEED, M3_DIRECTION);
+// DC motor 3's encoder and PID values
 Encoder M3_ENCODER(M3_ENCODER_A, M3_ENCODER_B);
 ArduPID M3_PID;
 
@@ -78,8 +75,7 @@ volatile double M3_pid_out = 0;
 volatile unsigned long M3_last_time;
 volatile long M3_last_enc;
 
-// DC motor 4's driver, encoder, and PID values
-L293_twoWire M4_DRIVER(M4_SPEED, M4_DIRECTION);
+// DC motor 4's encoder and PID values
 Encoder M4_ENCODER(M4_ENCODER_A, M4_ENCODER_B);
 ArduPID M4_PID;
 
@@ -90,35 +86,20 @@ volatile unsigned long M4_last_time;
 volatile long M4_last_enc;
 
 // PID motor constants
-#define SPEED_KP 1
-#define SPEED_KI 0.005
-#define SPEED_KD 0.4
+#define SPEED_KP 0.75
+#define SPEED_KI 0.01
+#define SPEED_KD 0.25
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
-  pinMode(M1_ENCODER_A, INPUT);
-  pinMode(M1_ENCODER_B, INPUT);
+  // encoder pins already set
 
-  pinMode(M2_ENCODER_A, INPUT);
-  pinMode(M2_ENCODER_B, INPUT);
-
-  pinMode(M3_ENCODER_A, INPUT);
-  pinMode(M3_ENCODER_B, INPUT);
-
-  pinMode(M4_ENCODER_A, INPUT);
-  pinMode(M4_ENCODER_B, INPUT);
-
-  pinMode(M1_SPEED, OUTPUT);
-  pinMode(M2_SPEED, OUTPUT);
-  pinMode(M3_SPEED, OUTPUT);
-  pinMode(M4_SPEED, OUTPUT);
-
-  pinMode(M1_DIRECTION, OUTPUT);
-  pinMode(M2_DIRECTION, OUTPUT);
-  pinMode(M3_DIRECTION, OUTPUT);
-  pinMode(M4_DIRECTION, OUTPUT);
+  DRIVER_A.attachMotorA(M1_FORWARD, M1_BACKWARD); // M1 pins
+  DRIVER_A.attachMotorB(M2_FORWARD, M2_BACKWARD); // M2 pins
+  DRIVER_B.attachMotorA(M3_FORWARD, M3_BACKWARD); // M3 pins
+  DRIVER_B.attachMotorB(M4_FORWARD, M4_BACKWARD); // M4 pins
 
   // start DC encoders' time/position
   M1_last_time = millis();
@@ -173,7 +154,7 @@ void spin_motor(int motor, int input_speed)
       current_enc = M1_ENCODER.read();
       time_elapsed = current_time - M1_last_time;
       encoder_difference = current_enc - M1_last_enc; // do ticks -> rotations
-      M1_current_speed = 1000 * (((float)encoder_difference * DEGREES_PER_TICK / (float) time_elapsed)); // degrees / second
+      M1_current_speed = 1000 * (((float)encoder_difference * DEGREES_PER_TICK) / ((float) time_elapsed)); // degrees / second
 
       // update encoder/time values
       M1_last_time = current_time;
@@ -181,22 +162,22 @@ void spin_motor(int motor, int input_speed)
 
       // perform PID using updated data and update speed
       M1_PID.compute();
-      if (M1_pid_out > 0)
-        M1_DRIVER.forward(M1_pid_out);
+      if (M1_pid_out < 0)
+        DRIVER_A.motorAForward(M1_pid_out);
       else
-        M1_DRIVER.back(abs(M1_pid_out));
+        DRIVER_A.motorAReverse(abs(M1_pid_out));
 
-      //      Serial.print("M1 time_elapsed: ");
-      //      Serial.println(time_elapsed);
-      //      Serial.print("M1 encoder_difference: ");
-      //      Serial.println(encoder_difference);
-      //      Serial.print("M1 target: ");
-      //      Serial.println(M1_target_speed);
-      //      Serial.print("M1 current: ");
-      //      Serial.println(M1_current_speed);
-      //      Serial.print("M1 PID: ");
-      //      Serial.println(M1_pid_out);
-      //      Serial.println("~~~~~~~~");
+      Serial.print("M1 time_elapsed: ");
+      Serial.println(time_elapsed);
+      Serial.print("M1 encoder_difference: ");
+      Serial.println(encoder_difference);
+      Serial.print("M1 target: ");
+      Serial.println(M1_target_speed);
+      Serial.print("M1 current: ");
+      Serial.println(M1_current_speed);
+      Serial.print("M1 PID: ");
+      Serial.println(M1_pid_out);
+      Serial.println("~~~~~~~~");
       break;
 
     case 2:
@@ -217,9 +198,9 @@ void spin_motor(int motor, int input_speed)
       // perform PID using updated data and update speed
       M2_PID.compute();
       if (M2_pid_out > 0)
-        M2_DRIVER.forward(M2_pid_out);
+        DRIVER_A.motorBForward(M2_pid_out);
       else
-        M2_DRIVER.back(abs(M2_pid_out));
+        DRIVER_A.motorBReverse(abs(M2_pid_out));
 
       // Serial.print("M2 time_elapsed: ");
       // Serial.println(time_elapsed);
@@ -251,10 +232,10 @@ void spin_motor(int motor, int input_speed)
 
       // perform PID using updated data and update speed
       M3_PID.compute();
-      if (M3_pid_out < 0)
-        M3_DRIVER.forward(M3_pid_out);
+      if (M3_pid_out > 0)
+        DRIVER_B.motorAForward(M3_pid_out);
       else
-        M3_DRIVER.back(abs(M3_pid_out));
+        DRIVER_B.motorAReverse(abs(M3_pid_out));
 
       // Serial.print("M3 time_elapsed: ");
       // Serial.println(time_elapsed);
@@ -287,9 +268,9 @@ void spin_motor(int motor, int input_speed)
       // perform PID using updated data and update speed
       M4_PID.compute();
       if (M4_pid_out > 0)
-        M4_DRIVER.forward(M4_pid_out);
+        DRIVER_B.motorBForward(M4_pid_out);
       else
-        M4_DRIVER.back(abs(M4_pid_out));
+        DRIVER_B.motorBReverse(abs(M4_pid_out));
 
       // Serial.print("M4 time_elapsed: ");
       // Serial.println(time_elapsed);
@@ -345,6 +326,13 @@ void loop()
     int result = sscanf(input_buffer, "%d %d %d %d\n",
                         &M1_new_speed, &M2_new_speed,
                         &M3_new_speed, &M4_new_speed);
+
+    // check for bad input
+    if (result != 4)
+    {
+      Serial.println("Didn't enter correct format.");
+      return;
+    }
   }
 
   // update motors if desired speed changed
@@ -360,14 +348,14 @@ void loop()
   if (M4_current_speed != M4_new_speed)
     spin_motor(M4, M4_new_speed);
 
-  // Serial.println("~~~~~~~~~~");
-  // Serial.print("M1 PID output: ");
-  // Serial.println(M1_pid_out);
-  // Serial.print("M2 PID output: ");
-  // Serial.println(M2_pid_out);
-  // Serial.print("M3 PID output: ");
-  // Serial.println(M3_pid_out);
-  // Serial.print("M4 PID output: ");
-  // Serial.println(M4_pid_out);
-  // Serial.println("~~~~~~~~~~");
+  //  Serial.println("~~~~~~~~~~");
+  //  Serial.print("M1 PID output: ");
+  //  Serial.println(M1_pid_out);
+  //  Serial.print("M2 PID output: ");
+  //  Serial.println(M2_pid_out);
+  //  Serial.print("M3 PID output: ");
+  //  Serial.println(M3_pid_out);
+  //  Serial.print("M4 PID output: ");
+  //  Serial.println(M4_pid_out);
+  //  Serial.println("~~~~~~~~~~");
 }
