@@ -21,8 +21,8 @@ const int M2_FORWARD = 11;
 const int M2_BACKWARD = 10;
 const int M3_FORWARD = 9;
 const int M3_BACKWARD = 8;
-const int M4_FORWARD = 3;
-const int M4_BACKWARD = 2;
+const int M4_FORWARD = 7;
+const int M4_BACKWARD = 6;
 
 // motor encoder pins (interrupts for A)
 const int M1_ENCODER_A = 18;
@@ -31,8 +31,8 @@ const int M2_ENCODER_A = 19;
 const int M2_ENCODER_B = 15;
 const int M3_ENCODER_A = 20;
 const int M3_ENCODER_B = 16;
-const int M4_ENCODER_A = 21;
-const int M4_ENCODER_B = 17;
+const int M4_ENCODER_A = 3;
+const int M4_ENCODER_B = 2;
 
 // motor objects (A for 1&2, B for 3&4)
 DRV8833 DRIVER_A = DRV8833();
@@ -100,7 +100,7 @@ void read_encoder(Encoder encoder_object)
 {
   Encoder current_encoder = encoder_object;
   
-  long new_position = current_encoder.read(); // change for desired motor
+  long new_position = current_encoder.read(); // changed for desired motor
   if (new_position != old_position)
   {
     old_position = new_position;
@@ -112,6 +112,6 @@ void loop()
 {
   // drive motor and read encoder values
   // change desired motor/encoder to test
-  spin_motor(M1, 35);
-  read_encoder(M1_ENCODER);
+  spin_motor(M4, 100);
+  read_encoder(M4_ENCODER);
 }

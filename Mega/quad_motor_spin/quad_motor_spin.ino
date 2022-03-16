@@ -18,8 +18,8 @@ const int M2_FORWARD = 11;
 const int M2_BACKWARD = 10;
 const int M3_FORWARD = 9;
 const int M3_BACKWARD = 8;
-const int M4_FORWARD = 3;
-const int M4_BACKWARD = 2;
+const int M4_FORWARD = 7;
+const int M4_BACKWARD = 6;
 
 // motor objects (A for 1&2, B for 3&4)
 DRV8833 DRIVER_A = DRV8833();
@@ -72,15 +72,15 @@ void spin_motor(int motor, int target_speed)
 
 void loop()
 {
-  spin_motor(M1, 50);
-//  spin_motor(M2, 255);
-//  spin_motor(M3, 255);
-//  spin_motor(M4, 255);
+  spin_motor(M1, 255);
+  spin_motor(M2, 255);
+  spin_motor(M3, 255);
+  spin_motor(M4, 255);
   delay(3000);
   
-  spin_motor(M1, -200);
-//  spin_motor(M2, -255);
-//  spin_motor(M3, -255);
-//  spin_motor(M4, -255);
+  spin_motor(M1, -255);
+  spin_motor(M2, -255);
+  spin_motor(M3, -255);
+  spin_motor(M4, -255);
   delay(3000);
 }
