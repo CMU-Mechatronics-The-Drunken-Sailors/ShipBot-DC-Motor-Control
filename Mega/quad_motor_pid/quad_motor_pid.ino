@@ -114,7 +114,7 @@ void setup()
   M4_last_time = millis();
   M4_last_enc = M4_ENCODER.read();
 
-  delay(10);
+  delay(10); // wait for initialization
 
   // set up DC motor PIDs with constants to control speed
   M1_PID.begin(&M1_current_speed, &M1_pid_out, &M1_target_speed, SPEED_KP, SPEED_KI, SPEED_KD);
@@ -169,6 +169,7 @@ void spin_motor(int motor, int input_speed)
       else
         DRIVER_A.motorAReverse(abs(M1_pid_out));
 
+      // debug data
       //      Serial.print("M1 time_elapsed: ");
       //      Serial.println(time_elapsed);
       //      Serial.print("M1 encoder_difference: ");
@@ -204,6 +205,7 @@ void spin_motor(int motor, int input_speed)
       else
         DRIVER_A.motorBReverse(abs(M2_pid_out));
 
+      // debug data
       //      Serial.print("M2 time_elapsed: ");
       //      Serial.println(time_elapsed);
       //      Serial.print("M2 encoder_difference: ");
@@ -239,17 +241,18 @@ void spin_motor(int motor, int input_speed)
       else
         DRIVER_B.motorAReverse(abs(M3_pid_out));
 
-      // Serial.print("M3 time_elapsed: ");
-      // Serial.println(time_elapsed);
-      // Serial.print("M3 encoder_difference: ");
-      // Serial.println(encoder_difference);
-      // Serial.print("M3 target: ");
-      // Serial.println(M3_target_speed);
-      // Serial.print("M3 current: ");
-      // Serial.println(M3_current_speed);
-      // Serial.print("M3 PID: ");
-      // Serial.println(M3_pid_out);
-      // Serial.println("~~~~~~~~");
+      // debug data
+      //      Serial.print("M3 time_elapsed: ");
+      //      Serial.println(time_elapsed);
+      //      Serial.print("M3 encoder_difference: ");
+      //      Serial.println(encoder_difference);
+      //      Serial.print("M3 target: ");
+      //      Serial.println(M3_target_speed);
+      //      Serial.print("M3 current: ");
+      //      Serial.println(M3_current_speed);
+      //      Serial.print("M3 PID: ");
+      //      Serial.println(M3_pid_out);
+      //      Serial.println("~~~~~~~~");
       break;
 
     case 4:
@@ -274,17 +277,18 @@ void spin_motor(int motor, int input_speed)
       else
         DRIVER_B.motorBReverse(abs(M4_pid_out));
 
-      // Serial.print("M4 time_elapsed: ");
-      // Serial.println(time_elapsed);
-      // Serial.print("M4 encoder_difference: ");
-      // Serial.println(encoder_difference);
-      // Serial.print("M4 target: ");
-      // Serial.println(M4_target_speed);
-      // Serial.print("M4 current: ");
-      // Serial.println(M4_current_speed);
-      // Serial.print("M4 PID: ");
-      // Serial.println(M4_pid_out);
-      // Serial.println("~~~~~~~~");
+      // debug data
+      //      Serial.print("M4 time_elapsed: ");
+      //      Serial.println(time_elapsed);
+      //      Serial.print("M4 encoder_difference: ");
+      //      Serial.println(encoder_difference);
+      //      Serial.print("M4 target: ");
+      //      Serial.println(M4_target_speed);
+      //      Serial.print("M4 current: ");
+      //      Serial.println(M4_current_speed);
+      //      Serial.print("M4 PID: ");
+      //      Serial.println(M4_pid_out);
+      //      Serial.println("~~~~~~~~");
       break;
 
     default:
@@ -329,39 +333,24 @@ void loop()
                         &M1_new_speed, &M2_new_speed,
                         &M3_new_speed, &M4_new_speed);
 
-    //    Serial.println("OK");
+    Serial.println("OK");
   }
 
-  // update motors if desired speed changed
-  //  M1_PID.compute();
-  //  if (M1_current_speed != M1_new_speed)
+  // update motor speeds
   spin_motor(M1, M1_new_speed);
-
-  //  M2_PID.compute();
-  //  if (M2_current_speed != M2_new_speed)
   spin_motor(M2, M2_new_speed);
-
-  //  M3_PID.compute();
-  //  if (M3_current_speed != M3_new_speed)
   spin_motor(M3, M3_new_speed);
-
-  //  M4_PID.compute();
-  //  if (M4_current_speed != M4_new_speed)
   spin_motor(M4, M4_new_speed);
 
-  delay(10);
+  delay(10); // don't go too fast!
 
-  //    Serial.println("~~~~~~~~~~");
-  //    Serial.print("M1 speed: ");
-  Serial.println(M1_pid_out);
-//  Serial.print(" ");
-//  Serial.print(M2_current_speed);
-//  Serial.print(" ");
-  //    Serial.print("M3 speed: ");
-//  Serial.print(M3_current_speed);
-//  Serial.print(" ");
-  //    Serial.print("M4 speed: ");
-//  Serial.print(M4_current_speed);
-//  Serial.println(" ");
-  //    Serial.println("~~~~~~~~~~");
+  // plot PID outputs for tuning
+  //  Serial.println(M1_pid_out);
+  //  Serial.print(" ");
+  //  Serial.print(M2_pid_out);
+  //  Serial.print(" ");
+  //  Serial.print(M3_pid_out);
+  //  Serial.print(" ");
+  //  Serial.print(M4_pid_out);
+  //  Serial.println();
 }
