@@ -9,7 +9,7 @@ quad_motor_encoder - used to test DC motor encoders, spinning motors and reading
 
 quad_motor_pid - used to test DC motor control with PID feedback based on encoder readings, controlled via serial communications to send commands of degrees/second
 
-Two folders - one implemented on the Arduino Mega and the other on the Teensy 4.1. Very similar code - only difference is the pinout. (Could probably merge the code and just use #ifdef to change pins based on which device used...)
+Two folders - one implemented on the Arduino Mega and the other on the Teensy 4.1. Very similar code - only difference is the pinout. Teensy code is not fully working since we decided to use the Mega, instead. Could probably merge the code and just use #ifdef to change pins based on which device used...
 
 Motors used: https://www.digikey.com/en/products/detail/dfrobot/FIT0186/6588528
 
