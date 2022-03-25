@@ -13,14 +13,14 @@ const int M3 = 3;
 const int M4 = 4;
 
 // motor speed/direction pins (PWM)
-const int M1_FORWARD = 13;
-const int M1_BACKWARD = 12;
-const int M2_FORWARD = 11;
-const int M2_BACKWARD = 10;
-const int M3_FORWARD = 9;
-const int M3_BACKWARD = 8;
-const int M4_FORWARD = 7;
-const int M4_BACKWARD = 6;
+const int M1_FORWARD = 7;
+const int M1_BACKWARD = 6;
+const int M2_FORWARD = 9;
+const int M2_BACKWARD = 8;
+const int M3_FORWARD = 13;
+const int M3_BACKWARD = 12;
+const int M4_FORWARD = 11;
+const int M4_BACKWARD = 10;
 
 // motor objects (A for 1&2, B for 3&4)
 DRV8833 DRIVER_A = DRV8833();

@@ -19,28 +19,28 @@ const int M3 = 3;
 const int M4 = 4;
 
 // motor speed/direction pins (PWM)
-const int M1_FORWARD = 13;
-const int M1_BACKWARD = 12;
-const int M2_FORWARD = 11;
-const int M2_BACKWARD = 10;
-const int M3_FORWARD = 9;
-const int M3_BACKWARD = 8;
-const int M4_FORWARD = 7;
-const int M4_BACKWARD = 6;
+const int M1_FORWARD = 7;
+const int M1_BACKWARD = 6;
+const int M2_FORWARD = 9;
+const int M2_BACKWARD = 8;
+const int M3_FORWARD = 13;
+const int M3_BACKWARD = 12;
+const int M4_FORWARD = 11;
+const int M4_BACKWARD = 10;
 
 // motor objects (A for 1&2, B for 3&4)
 DRV8833 DRIVER_A = DRV8833();
 DRV8833 DRIVER_B = DRV8833();
 
 // motor encoder pins (interrupts for A)
-const int M1_ENCODER_A = 18;
-const int M1_ENCODER_B = 14;
-const int M2_ENCODER_A = 19;
-const int M2_ENCODER_B = 15;
-const int M3_ENCODER_A = 20;
-const int M3_ENCODER_B = 16;
-const int M4_ENCODER_A = 3;
-const int M4_ENCODER_B = 2;
+const int M1_ENCODER_A = 19;
+const int M1_ENCODER_B = 15;
+const int M2_ENCODER_A = 18;
+const int M2_ENCODER_B = 14;
+const int M3_ENCODER_A = 3;
+const int M3_ENCODER_B = 2;
+const int M4_ENCODER_A = 20;
+const int M4_ENCODER_B = 16;
 
 // based on ticks per revolution
 const float DEGREES_PER_TICK = (360.0 / 2797.0);
