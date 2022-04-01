@@ -336,11 +336,11 @@ void loop()
     Serial.println("OK");
   }
 
-  // update motor speeds
-  spin_motor(M1, M1_new_speed);
+  // update motor speeds, correcting for wheel orientation
+  spin_motor(M1, -1 * M1_new_speed);
   spin_motor(M2, M2_new_speed);
   spin_motor(M3, M3_new_speed);
-  spin_motor(M4, M4_new_speed);
+  spin_motor(M4, -1 * M4_new_speed);
 
   delay(10); // don't go too fast!
 
