@@ -124,7 +124,7 @@ void loop()
     if (M1_new_speed != M1_current_speed)
     {
       M1_current_speed = M1_new_speed;
-      spin_motor(M1, M1_current_speed);
+      spin_motor(M1, -1 * M1_current_speed);
     }
 
     if (M2_new_speed != M2_current_speed)
@@ -136,7 +136,7 @@ void loop()
     if (M3_new_speed != M3_current_speed)
     {
       M3_current_speed = M3_new_speed;
-      spin_motor(M3, M3_current_speed);
+      spin_motor(M3, -1 * M3_current_speed);
     }
 
     if (M4_new_speed != M4_current_speed)

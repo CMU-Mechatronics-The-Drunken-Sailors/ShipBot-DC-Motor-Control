@@ -72,15 +72,15 @@ void spin_motor(int motor, int target_speed)
 
 void loop()
 {
-  spin_motor(M1, 255);
+  spin_motor(M1, -1 * 255);
   spin_motor(M2, 255);
-  spin_motor(M3, 255);
+  spin_motor(M3, -1 * 255);
   spin_motor(M4, 255);
   delay(3000);
   
-  spin_motor(M1, -255);
+  spin_motor(M1, -1 * -255);
   spin_motor(M2, -255);
-  spin_motor(M3, -255);
+  spin_motor(M3, -1 * -255);
   spin_motor(M4, -255);
   delay(3000);
 }
