@@ -13,8 +13,8 @@ const int M3 = 3;
 const int M4 = 4;
 
 // motor speed/direction pins (PWM)
-const int M1_FORWARD = 7;
-const int M1_BACKWARD = 6;
+const int M1_FORWARD = 5;
+const int M1_BACKWARD = 4;
 const int M2_FORWARD = 9;
 const int M2_BACKWARD = 8;
 const int M3_FORWARD = 13;
