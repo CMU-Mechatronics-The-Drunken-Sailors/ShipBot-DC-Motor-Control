@@ -329,15 +329,11 @@ void loop()
     serial_input.toCharArray(input_buffer, input_buffer_len);
     
     // check if we need to send encoder data to Jetson
-    if input_buffer[0] == 'E'
+    if (input_buffer[0] == 'E')
     {
-      long encoder_data[5] = {0};
-      encoder_data[0] = M1_ENCODER.read();
-      encoder_data[1] = M2_ENCODER.read();
-      encoder_data[2] = M3_ENCODER.read();
-      encoder_data[3] = M4_ENCODER.read();
-      
-      Serial.write(encoder_data);
+      char encoder_data[256];
+      sprintf(encoder_data, "%ld %ld %ld %ld\n", M1_ENCODER.read(), M2_ENCODER.read(), M3_ENCODER.read(), M4_ENCODER.read());
+      Serial.println(encoder_data);
       return;
     }
     
@@ -354,7 +350,7 @@ void loop()
   spin_motor(M2, M2_new_speed);
   spin_motor(M3, -1 * M3_new_speed);
   spin_motor(M4, M4_new_speed);
-
+  
   delay(10); // don't go too fast!
 
   // plot PID outputs for tuning
