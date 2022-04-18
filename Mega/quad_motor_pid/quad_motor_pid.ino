@@ -327,7 +327,20 @@ void loop()
     int input_buffer_len = serial_input.length() + 1;
     char input_buffer[input_buffer_len];
     serial_input.toCharArray(input_buffer, input_buffer_len);
-
+    
+    // check if we need to send encoder data to Jetson
+    if input_buffer[0] == 'E'
+    {
+      long encoder_data[5] = {0};
+      encoder_data[0] = M1_ENCODER.read();
+      encoder_data[1] = M2_ENCODER.read();
+      encoder_data[2] = M3_ENCODER.read();
+      encoder_data[3] = M4_ENCODER.read();
+      
+      Serial.write(encoder_data);
+      return;
+    }
+    
     // parse serial input: m1_speed m2_speed m3_speed m4_speed
     int result = sscanf(input_buffer, "%d %d %d %d\n",
                         &M1_new_speed, &M2_new_speed,
