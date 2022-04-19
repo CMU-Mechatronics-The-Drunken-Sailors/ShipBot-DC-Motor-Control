@@ -327,22 +327,24 @@ void loop()
     int input_buffer_len = serial_input.length() + 1;
     char input_buffer[input_buffer_len];
     serial_input.toCharArray(input_buffer, input_buffer_len);
-    
+
     // check if we need to send encoder data to Jetson
     if (input_buffer[0] == 'E')
     {
       char encoder_data[256];
-      sprintf(encoder_data, "%ld %ld %ld %ld\n", M1_ENCODER.read(), M2_ENCODER.read(), M3_ENCODER.read(), M4_ENCODER.read());
+      sprintf(encoder_data, "%ld %ld %ld %ld", M1_ENCODER.read(), M2_ENCODER.read(), M3_ENCODER.read(), M4_ENCODER.read());
       Serial.println(encoder_data);
-      return;
     }
-    
-    // parse serial input: m1_speed m2_speed m3_speed m4_speed
-    int result = sscanf(input_buffer, "%d %d %d %d\n",
-                        &M1_new_speed, &M2_new_speed,
-                        &M3_new_speed, &M4_new_speed);
+    else
+    {
 
-    Serial.println("OK");
+      // parse serial input: m1_speed m2_speed m3_speed m4_speed
+      int result = sscanf(input_buffer, "%d %d %d %d\n",
+                          &M1_new_speed, &M2_new_speed,
+                          &M3_new_speed, &M4_new_speed);
+
+      Serial.println("OK");
+    }
   }
 
   // update motor speeds, correcting for wheel orientation
@@ -350,7 +352,7 @@ void loop()
   spin_motor(M2, M2_new_speed);
   spin_motor(M3, -1 * M3_new_speed);
   spin_motor(M4, M4_new_speed);
-  
+
   delay(10); // don't go too fast!
 
   // plot PID outputs for tuning
