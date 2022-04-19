@@ -86,7 +86,7 @@ unsigned long M4_last_time;
 long M4_last_enc;
 
 // PID motor constants
-#define SPEED_KP 0.75
+#define SPEED_KP 1
 #define SPEED_KI 0.00
 #define SPEED_KD 0.25
 
@@ -120,21 +120,25 @@ void setup()
   M1_PID.begin(&M1_current_speed, &M1_pid_out, &M1_target_speed, SPEED_KP, SPEED_KI, SPEED_KD);
   M1_PID.setOutputLimits(-255, 255);
   M1_PID.setWindUpLimits(-255, 255);
+  M1_PID.setBias(0.25);
   M1_PID.start();
 
   M2_PID.begin(&M2_current_speed, &M2_pid_out, &M2_target_speed, SPEED_KP, SPEED_KI, SPEED_KD);
   M2_PID.setOutputLimits(-255, 255);
   M2_PID.setWindUpLimits(-255, 255);
+  M2_PID.setBias(0.25);
   M2_PID.start();
 
   M3_PID.begin(&M3_current_speed, &M3_pid_out, &M3_target_speed, SPEED_KP, SPEED_KI, SPEED_KD);
   M3_PID.setOutputLimits(-255, 255);
   M3_PID.setWindUpLimits(-255, 255);
+  M3_PID.setBias(0.25);
   M3_PID.start();
 
   M4_PID.begin(&M4_current_speed, &M4_pid_out, &M4_target_speed, SPEED_KP, SPEED_KI, SPEED_KD);
   M4_PID.setOutputLimits(-255, 255);
   M4_PID.setWindUpLimits(-255, 255);
+  M4_PID.setBias(0.25);
   M4_PID.start();
 }
 
